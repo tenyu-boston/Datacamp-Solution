@@ -1,1 +1,18 @@
-dasf
+1. Restricted and unrestricted decision trees
+# Build restricted decision tree
+clf = DecisionTreeClassifier(min_samples_leaf=3, min_samples_split=9, random_state=500, max_depth=4, max_features=2)
+clf.fit(X_train, y_train)
+
+# Predict the labels
+pred = clf.predict(X_test)
+
+# Print the confusion matrix
+cm = confusion_matrix(y_test, pred)
+print('Confusion matrix:\n', cm)
+
+# Print the F1 score
+score = f1_score(y_test, pred)
+print('F1-Score: {:.3f}'.format(score))
+
+2. "Weak" decision tree
+Answer: Model A is fine-tuned while model B is "weak".
