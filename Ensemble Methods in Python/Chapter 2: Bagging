@@ -16,3 +16,94 @@ print('F1-Score: {:.3f}'.format(score))
 
 2. "Weak" decision tree
 Answer: Model A is fine-tuned while model B is "weak".
+
+3. Training with bootstrapping
+# Take a sample with replacement
+X_train_sample = X_train.sample(replace=True, frac=1.0, random_state=42)
+y_train_sample = y_train.loc[X_train_sample.index]
+
+# Build a "weak" Decision Tree classifier
+clf = DecisionTreeClassifier(max_depth=4, max_features=2, random_state=500)
+
+# Fit the model to the training sample
+clf.fit(X_train_sample, y_train_sample)
+
+4. A first attempt at bagging
+# Build the list of individual models
+clf_list = []
+for i in range(21):
+	weak_dt = build_decision_tree(X_train, y_train, random_state=i)
+	clf_list.append(weak_dt)
+
+# Predict on the test set
+pred = predict_voting(clf_list, X_test)
+
+# Print the F1 score
+print('F1 score: {:.3f}'.format(f1_score(y_test, pred)))
+
+5. Bagging: the scikit-learn way
+# Instantiate the base model
+clf_dt = DecisionTreeClassifier(max_depth=4)
+
+# Build and train the Bagging classifier
+clf_bag = BaggingClassifier(
+  base_estimator=clf_dt,
+  n_estimators=21,
+  random_state=500)
+clf_bag.fit(X_train, y_train)
+
+# Predict the labels of the test set
+pred = clf_bag.predict(X_test)
+
+# Show the F1-score
+print('F1-Score: {:.3f}'.format(f1_score(y_test, pred)))
+
+6. Checking the out-of-bag score
+# Build and train the bagging classifier
+clf_bag = BaggingClassifier(
+  base_estimator=clf_dt,
+  n_estimators=21,
+  oob_score=True,
+  random_state=500)
+clf_bag.fit(X_train, y_train)
+
+# Print the out-of-bag score
+print('OOB-Score: {:.3f}'.format(clf_bag.oob_score_))
+
+# Evaluate the performance on the test set to compare
+pred = clf_bag.predict(X_test)
+print('Accuracy: {:.3f}'.format(accuracy_score(y_test, pred)))
+
+7. Exploring the UCI SECOM data
+Answer: There is evidence of high class imbalance in the target.
+
+8. A more complex bagging model
+# Build a balanced logistic regression
+clf_lr = LogisticRegression(class_weight='balanced')
+
+# Build and fit a bagging classifier
+clf_bag = BaggingClassifier(base_estimator=clf_lr, max_features=10, oob_score=True, random_state=500)
+clf_bag.fit(X_train, y_train)
+
+# Evaluate the accuracy on the test set and show the out-of-bag score
+pred = clf_bag.predict(X_test)
+print('Accuracy:  {:.2f}'.format(accuracy_score(y_test, pred)))
+print('OOB-Score: {:.2f}'.format(clf_bag.oob_score_))
+
+# Print the confusion matrix
+print(confusion_matrix(y_test, pred))
+
+9. Tuning bagging hyperparameters
+# Build a balanced logistic regression
+clf_base = LogisticRegression(class_weight='balanced', random_state=42)
+
+# Build and fit a bagging classifier with custom parameters
+clf_bag = BaggingClassifier(base_estimator=clf_base, max_features=10, bootstrap=False, n_estimators = 500, max_samples=0.65, random_state=500)
+clf_bag.fit(X_train, y_train)
+
+# Calculate predictions and evaluate the accuracy on the test set
+y_pred = clf_bag.predict(X_test)
+print('Accuracy:  {:.2f}'.format(accuracy_score(y_test, y_pred)))
+
+# Print the classification report
+print(classification_report(y_test, y_pred))
