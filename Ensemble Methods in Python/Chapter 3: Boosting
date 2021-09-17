@@ -1,0 +1,68 @@
+1. Introducing the movie database
+Answer: There are many zero values.
+
+2. Exploring movie features
+The only feature with missing values is 'runtime'.
+
+3. Predicting movie revenue
+# Build and fit linear regression model
+reg_lm = LinearRegression(normalize=True)
+reg_lm.fit(X_train, y_train)
+
+# Calculate the predictions on the test set
+pred = reg_lm.predict(X_test)
+
+# Evaluate the performance using the RMSE
+rmse = np.sqrt(mean_squared_error(pred, y_test))
+print('RMSE: {:.3f}'.format(rmse))
+
+4. Boosting for predicted revenue
+# Fit a linear regression model to the previous errors
+reg_error = LinearRegression(normalize=True)
+reg_error.fit(X_train_pop, y_train_error)
+
+# Calculate the predicted errors on the test set
+pred_error = reg_error.predict(X_test_pop)
+
+# Evaluate the updated performance
+rmse_error = np.sqrt(mean_squared_error(y_test_error, pred_error))
+print('RMSE: {:.3f}'.format(rmse_error))
+
+5. Your first AdaBoost model
+# Instantiate a normalized linear regression model
+reg_lm = LinearRegression(normalize=True)
+
+# Build and fit an AdaBoost regressor
+reg_ada = AdaBoostRegressor(base_estimator=reg_lm, n_estimators = 12, random_state=500)
+reg_ada.fit(X_train, y_train)
+
+# Calculate the predictions on the test set
+pred = reg_ada.predict(X_test)
+
+# Evaluate the performance using the RMSE
+rmse = np.sqrt(mean_squared_error(y_test, pred))
+print('RMSE: {:.3f}'.format(rmse))
+
+6. Tree-based AdaBoost regression
+# Build and fit a tree-based AdaBoost regressor
+reg_ada = AdaBoostRegressor(n_estimators=12, random_state=500)
+reg_ada.fit(X_train, y_train)
+
+# Calculate the predictions on the test set
+pred = reg_ada.predict(X_test)
+
+# Evaluate the performance using the RMSE
+rmse = np.sqrt(mean_squared_error(y_test, pred))
+print('RMSE: {:.3f}'.format(rmse))
+
+7. Making the most of AdaBoost
+# Build and fit an AdaBoost regressor
+reg_ada = AdaBoostRegressor(n_estimators=100, learning_rate=0.01, random_state=500)
+reg_ada.fit(X_train, y_train)
+
+# Calculate the predictions on the test set
+pred = reg_ada.predict(X_test)
+
+# Evaluate the performance using the RMSE
+rmse = np.sqrt(mean_squared_error(y_test, pred))
+print('RMSE: {:.3f}'.format(rmse))
